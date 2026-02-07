@@ -60,7 +60,7 @@ generate_config
 if [ "$#" -gt 0 ]; then
     exec "$@"
 else
-    ARGS="--port 18789 --verbose"
+    ARGS="--host 0.0.0.0 --port 18789 --verbose"
     
     if [ ! -f "/root/.openclaw/openclaw.json" ]; then
         echo "No configuration file found at /root/.openclaw/openclaw.json. Adding --allow-unconfigured flag."

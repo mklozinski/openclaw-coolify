@@ -19,7 +19,12 @@ This repository contains the necessary configuration to deploy OpenClaw (Persona
     -   `OPENROUTER_API_KEY`: Your OpenRouter API Key.
     -   `OPENCLAW_MODEL`: (Optional) The model you want to use, e.g., `anthropic/claude-3-opus`. Defaults to `anthropic/claude-3-opus-20240229`.
 6.  Deploy the service.
-7.  Access the OpenClaw Gateway on port `18789`.
+7.  **Configuration in Coolify UI**:
+    -   Go to **Service** -> **Settings**.
+    -   Set **Domains** to your desired domain (e.g., `https://openclaw.your-domain.com`).
+    -   Ensure **Port Exposes** (or **Ports Exposes**) maps to container port `18789`. Usually Coolify detects this from the docker-compose or lets you specify it.
+    -   Save settings. Coolify should generate the Traefik configuration automatically.
+8.  Access the OpenClaw Gateway at your domain.
 
 ### Using Docker Compose Locally
 
