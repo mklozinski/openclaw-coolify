@@ -4,7 +4,7 @@ set -e
 # Ensure the config directory exists
 mkdir -p /root/.openclaw
 
-# Function to generate openclaw.json if it doesn't exist
+# Function to generate openclaw.json
 generate_config() {
     # Allow full config injection via env var
     if [ -n "$OPENCLAW_CONFIG_CONTENT" ]; then
@@ -13,12 +13,7 @@ generate_config() {
         return
     fi
 
-    if [ -f "/root/.openclaw/openclaw.json" ]; then
-        echo "Config file already exists at /root/.openclaw/openclaw.json"
-        return
-    fi
-    
-    echo "Generating /root/.openclaw/openclaw.json from environment variables..."
+    echo "Generating /root/.openclaw/openclaw.json..."
 
     # Default model if not specified
     MODEL=${OPENCLAW_MODEL:-"anthropic/claude-3-opus-20240229"}
@@ -26,16 +21,16 @@ generate_config() {
     # Check for OpenRouter specific config
     if [ -n "$OPENROUTER_API_KEY" ]; then
         echo "Configuring for OpenRouter..."
-        printf '{\n  "gateway": {\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openrouter",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENROUTER_API_KEY" > /root/.openclaw/openclaw.json
+        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openrouter",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENROUTER_API_KEY" > /root/.openclaw/openclaw.json
     elif [ -n "$OPENAI_API_KEY" ]; then
          echo "Configuring for OpenAI..."
-         printf '{\n  "gateway": {\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openai",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENAI_API_KEY" > /root/.openclaw/openclaw.json
+         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openai",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENAI_API_KEY" > /root/.openclaw/openclaw.json
     elif [ -n "$ANTHROPIC_API_KEY" ]; then
          echo "Configuring for Anthropic..."
-         printf '{\n  "gateway": {\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "anthropic",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$ANTHROPIC_API_KEY" > /root/.openclaw/openclaw.json
+         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "anthropic",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$ANTHROPIC_API_KEY" > /root/.openclaw/openclaw.json
     else
-        echo "No API key found. Generating minimal configuration with gateway.bind=lan..."
-        printf '{\n  "gateway": {\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" > /root/.openclaw/openclaw.json
+        echo "No API key found. Generating minimal configuration..."
+        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" > /root/.openclaw/openclaw.json
     fi
 }
 
