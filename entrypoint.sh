@@ -34,8 +34,8 @@ generate_config() {
          echo "Configuring for Anthropic..."
          printf '{\n  "gateway": {\n    "bindAddress": "0.0.0.0",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "anthropic",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$ANTHROPIC_API_KEY" > /root/.openclaw/openclaw.json
     else
-        echo "No API key found in environment variables (OPENROUTER_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY)."
-        echo "Starting with default/empty configuration. You may need to configure OpenClaw manually."
+        echo "No API key found. Generating minimal configuration with bindAddress 0.0.0.0..."
+        printf '{\n  "gateway": {\n    "bindAddress": "0.0.0.0",\n    "auth": { "token": "%s" }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" > /root/.openclaw/openclaw.json
     fi
 }
 
