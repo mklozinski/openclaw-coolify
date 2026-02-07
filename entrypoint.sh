@@ -73,15 +73,20 @@ EOF
 generate_config
 
 # If arguments are passed to the script, run them.
-# Otherwise, run the default gateway command.
+# Otherwise, run the default gateway command, adding --allow-unconfigured if needed.
 if [ "$#" -gt 0 ]; then
     exec "$@"
 else
-    echo "Starting OpenClaw Gateway..."
-    # Ensure dependencies are installed if volume is empty/fresh (optional, but good for some setups)
-    # python3 and build tools are in the image.
+    ARGS=("--port" "18789" "--verbose")
     
+    if [ ! -f "/root/.openclaw/openclaw.json" ]; then
+        echo "No configuration file found at /root/.openclaw/openclaw.json. Adding --allow-unconfigured flag."
+        ARGS+=("--allow-unconfigured")
+    else
+        echo "Configuration found at /root/.openclaw/openclaw.json."
+    fi
+
+    echo "Starting OpenClaw Gateway with args: ${ARGS[*]}"
     # Run the gateway
-    # Using --host 0.0.0.0 to ensure it listens on all interfaces within the container
-    exec openclaw gateway --port 18789 --verbose
+    exec openclaw gateway "${ARGS[@]}"
 fi
