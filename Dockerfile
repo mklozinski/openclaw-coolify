@@ -26,4 +26,4 @@ RUN mkdir -p /root/.openclaw
 EXPOSE 18789
 
 # Set the entrypoint
-ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

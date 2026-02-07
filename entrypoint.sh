@@ -46,16 +46,16 @@ generate_config
 if [ "$#" -gt 0 ]; then
     exec "$@"
 else
-    ARGS=("--port" "18789" "--verbose")
+    ARGS="--port 18789 --verbose"
     
     if [ ! -f "/root/.openclaw/openclaw.json" ]; then
         echo "No configuration file found at /root/.openclaw/openclaw.json. Adding --allow-unconfigured flag."
-        ARGS+=("--allow-unconfigured")
+        ARGS="$ARGS --allow-unconfigured"
     else
         echo "Configuration found at /root/.openclaw/openclaw.json."
     fi
 
-    echo "Starting OpenClaw Gateway with args: ${ARGS[*]}"
+    echo "Starting OpenClaw Gateway with args: $ARGS"
     # Run the gateway
-    exec openclaw gateway "${ARGS[@]}"
+    exec openclaw gateway $ARGS
 fi
