@@ -6,6 +6,13 @@ mkdir -p /root/.openclaw
 
 # Function to generate openclaw.json if it doesn't exist
 generate_config() {
+    # Allow full config injection via env var
+    if [ -n "$OPENCLAW_CONFIG_CONTENT" ]; then
+        echo "Using custom configuration from OPENCLAW_CONFIG_CONTENT..."
+        echo "$OPENCLAW_CONFIG_CONTENT" > /root/.openclaw/openclaw.json
+        return
+    fi
+
     if [ -f "/root/.openclaw/openclaw.json" ]; then
         echo "Config file already exists at /root/.openclaw/openclaw.json"
         return
@@ -19,10 +26,7 @@ generate_config() {
     # Check for OpenRouter specific config
     if [ -n "$OPENROUTER_API_KEY" ]; then
         echo "Configuring for OpenRouter..."
-        # This structure is an approximation based on common patterns. 
-        # Users might need to mount their own config if this simple generation isn't enough.
-        # However, typically CLI tools allow setting keys via Env Vars too.
-        # We will try to write a simple JSON.
+        # Basic configuration for OpenRouter
         cat <<EOF > /root/.openclaw/openclaw.json
 {
   "agent": {
@@ -50,8 +54,6 @@ EOF
     else
         echo "No API key found in environment variables (OPENROUTER_API_KEY or OPENAI_API_KEY)."
         echo "Starting with default/empty configuration. You may need to configure OpenClaw manually."
-        # Initialize an empty safe config if needed, or just let OpenClaw handle it.
-        # openclaw onboard might be needed.
     fi
 }
 

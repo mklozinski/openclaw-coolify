@@ -47,10 +47,44 @@ Supported Environment Variables:
 
 The configuration and data are stored in `/root/.openclaw`. This directory is mounted as a volume (`openclaw_data`) to ensure persistence across restarts.
 
-## Troubleshooting
 
-You can view the logs to see the startup process:
+## Advanced Configuration: Multiple Models & Aliases
+
+To use multiple models or specific models for different tasks (to save costs), you have a few options:
+
+### 1. Using `OPENCLAW_CONFIG_CONTENT` (Recommended for Coolify)
+
+You can inject a full `openclaw.json` configuration using the `OPENCLAW_CONFIG_CONTENT` environment variable. This allows you to define multiple models and advanced settings.
+
+Example content for `OPENCLAW_CONFIG_CONTENT`:
+
+```json
+{
+  "agent": {
+    "model": "anthropic/claude-3-opus-20240229",
+    "fallbackModels": ["anthropic/claude-3-sonnet-20240229"]
+  },
+  "llm": {
+    "provider": "openrouter",
+    "apiKey": "sk-or-your-key"
+  }
+}
+```
+
+### 2. Switching Models via CLI
+
+You can switch models on the fly when interacting with the agent via CLI (if you sh exec into the container):
 
 ```bash
-docker-compose logs -f openclaw
+openclaw agent --model anthropic/claude-3-haiku --message "Quick check"
 ```
+
+### 3. Thinking Modes
+
+OpenClaw supports "Thinking Modes" which can adjust the depth of reasoning. While this doesn't directly map "low thinking" to a specific cheaper model by default without configuration, you can use:
+
+-   Normal: standard model
+-   `--thinking high`: Potentially uses more tokens/reasoning steps (check docs for specific model behavior).
+
+ To strictly enforce cheaper models for simple tasks, setting a cheaper "primary" model and only using the expensive one explicitly (or vice versa) via configuration is the best approach.
+
