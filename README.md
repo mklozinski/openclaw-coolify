@@ -42,6 +42,7 @@ Supported Environment Variables:
 -   `OPENROUTER_API_KEY`: Your OpenRouter API Key.
 -   `OPENAI_API_KEY`: Your OpenAI API Key (if using OpenAI directly).
 -   `ANTHROPIC_API_KEY`: Your Anthropic API Key (if using Anthropic directly).
+-   `OPENCLAW_GATEWAY_TOKEN`: A secure token for accessing the gateway. Ideally generated (e.g. `openssl rand -hex 16`). If not provided, a random one is generated on startup and printed to logs.
 -   `OPENCLAW_MODEL`: The model ID to use (e.g., `openai/gpt-4o`, `anthropic/claude-3-sonnet`).
 
 ## Persistence

@@ -39,6 +39,20 @@ generate_config() {
     fi
 }
 
+# Check for Gateway Token
+if [ -z "$OPENCLAW_GATEWAY_TOKEN" ]; then
+    echo "OPENCLAW_GATEWAY_TOKEN not set. Generating a random token..."
+    # Generate a random hex token
+    OPENCLAW_GATEWAY_TOKEN=$(openssl rand -hex 32 2>/dev/null || head -c 32 /dev/urandom | od -A n -t x1 | tr -d ' \n')
+    export OPENCLAW_GATEWAY_TOKEN
+    echo "========================================================================"
+    echo "GENERATED TOKEN: $OPENCLAW_GATEWAY_TOKEN"
+    echo "Use this token to connect to your gateway."
+    echo "To set a persistent token, add OPENCLAW_GATEWAY_TOKEN to your environment."
+    echo "========================================================================"
+fi
+
+
 generate_config
 
 # If arguments are passed to the script, run them.
