@@ -26,13 +26,13 @@ generate_config() {
     # Check for OpenRouter specific config
     if [ -n "$OPENROUTER_API_KEY" ]; then
         echo "Configuring for OpenRouter..."
-        printf '{\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openrouter",\n    "apiKey": "%s"\n  }\n}\n' "$MODEL" "$OPENROUTER_API_KEY" > /root/.openclaw/openclaw.json
+        printf '{\n  "gateway": {\n    "bindAddress": "0.0.0.0",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openrouter",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENROUTER_API_KEY" > /root/.openclaw/openclaw.json
     elif [ -n "$OPENAI_API_KEY" ]; then
          echo "Configuring for OpenAI..."
-         printf '{\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openai",\n    "apiKey": "%s"\n  }\n}\n' "$MODEL" "$OPENAI_API_KEY" > /root/.openclaw/openclaw.json
+         printf '{\n  "gateway": {\n    "bindAddress": "0.0.0.0",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openai",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENAI_API_KEY" > /root/.openclaw/openclaw.json
     elif [ -n "$ANTHROPIC_API_KEY" ]; then
          echo "Configuring for Anthropic..."
-         printf '{\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "anthropic",\n    "apiKey": "%s"\n  }\n}\n' "$MODEL" "$ANTHROPIC_API_KEY" > /root/.openclaw/openclaw.json
+         printf '{\n  "gateway": {\n    "bindAddress": "0.0.0.0",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "anthropic",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$ANTHROPIC_API_KEY" > /root/.openclaw/openclaw.json
     else
         echo "No API key found in environment variables (OPENROUTER_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY)."
         echo "Starting with default/empty configuration. You may need to configure OpenClaw manually."
@@ -60,7 +60,7 @@ generate_config
 if [ "$#" -gt 0 ]; then
     exec "$@"
 else
-    ARGS="--host 0.0.0.0 --port 18789 --verbose"
+    ARGS="--port 18789 --verbose"
     
     if [ ! -f "/root/.openclaw/openclaw.json" ]; then
         echo "No configuration file found at /root/.openclaw/openclaw.json. Adding --allow-unconfigured flag."

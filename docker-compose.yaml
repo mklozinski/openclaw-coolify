@@ -26,7 +26,7 @@ services:
       - coolify.managed=true
       - traefik.enable=true
       - traefik.http.middlewares.gzip.compress=true
-      - traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
+      #- traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https
       - traefik.http.services.openclaw.loadbalancer.server.port=18789
     stdin_open: true # openclaw might need stdin for interactive setup sometimes
     tty: true        # needed for stdin
