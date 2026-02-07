@@ -11,11 +11,11 @@ services:
     volumes:
       - ./data:/root/.openclaw
     environment:
-      # Use OPENROUTER_API_KEY if configuring OpenRouter
-      # OPENROUTER_API_KEY: your_openrouter_api_key_here
-      # OPENAI_API_KEY: your_openai_api_key_here
-      # OPENCLAW_CONFIG_CONTENT: "full json content"
-      
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENCLAW_MODEL=${OPENCLAW_MODEL:-anthropic/claude-3-opus-20240229}
+      - OPENCLAW_CONFIG_CONTENT=${OPENCLAW_CONFIG_CONTENT}
       # Optional: set timezone
       - TZ=UTC
     stdin_open: true # openclaw might need stdin for interactive setup sometimes

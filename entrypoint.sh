@@ -51,6 +51,19 @@ EOF
   }
 }
 EOF
+    elif [ -n "$ANTHROPIC_API_KEY" ]; then
+         echo "Configuring for Anthropic..."
+         cat <<EOF > /root/.openclaw/openclaw.json
+{
+  "agent": {
+    "model": "${MODEL}"
+  },
+  "llm": {
+    "provider": "anthropic",
+    "apiKey": "${ANTHROPIC_API_KEY}"
+  }
+}
+EOF
     else
         echo "No API key found in environment variables (OPENROUTER_API_KEY or OPENAI_API_KEY)."
         echo "Starting with default/empty configuration. You may need to configure OpenClaw manually."
