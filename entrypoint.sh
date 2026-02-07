@@ -21,16 +21,16 @@ generate_config() {
     # Check for OpenRouter specific config
     if [ -n "$OPENROUTER_API_KEY" ]; then
         echo "Configuring for OpenRouter..."
-        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openrouter",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENROUTER_API_KEY" > /root/.openclaw/openclaw.json
+        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openrouter",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENROUTER_API_KEY" > /root/.openclaw/openclaw.json
     elif [ -n "$OPENAI_API_KEY" ]; then
          echo "Configuring for OpenAI..."
-         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openai",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENAI_API_KEY" > /root/.openclaw/openclaw.json
+         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openai",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$OPENAI_API_KEY" > /root/.openclaw/openclaw.json
     elif [ -n "$ANTHROPIC_API_KEY" ]; then
          echo "Configuring for Anthropic..."
-         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "anthropic",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$ANTHROPIC_API_KEY" > /root/.openclaw/openclaw.json
+         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  },\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "anthropic",\n    "apiKey": "%s"\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" "$ANTHROPIC_API_KEY" > /root/.openclaw/openclaw.json
     else
         echo "No API key found. Generating minimal configuration..."
-        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "auth": { "token": "%s" }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" > /root/.openclaw/openclaw.json
+        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" > /root/.openclaw/openclaw.json
     fi
 }
 
