@@ -4,10 +4,26 @@ FROM node:22-bookworm
 # python3 and build-essential are often needed for native modules
 RUN apt-get update && apt-get install -y \
     python3 \
+    python3-pip \
     build-essential \
     git \
     dos2unix \
+    curl \
+    procps \
+    file \
     && rm -rf /var/lib/apt/lists/*
+
+# Install uv (fast python package manager)
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ENV PATH="/root/.cargo/bin:$PATH"
+
+# Install Homebrew (required for some skills)
+# define NONINTERACTIVE to avoid prompts
+ENV NONINTERACTIVE=1
+RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+# Add brew to path
+ONBUILD ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
 
 # Install OpenClaw globally
 RUN npm install -g openclaw@latest
