@@ -26,46 +26,15 @@ generate_config() {
     # Check for OpenRouter specific config
     if [ -n "$OPENROUTER_API_KEY" ]; then
         echo "Configuring for OpenRouter..."
-        # Basic configuration for OpenRouter
-        cat <<EOF > /root/.openclaw/openclaw.json
-{
-  "agent": {
-    "model": "${MODEL}"
-  },
-  "llm": {
-    "provider": "openrouter",
-    "apiKey": "${OPENROUTER_API_KEY}"
-  }
-}
-EOF
+        printf '{\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openrouter",\n    "apiKey": "%s"\n  }\n}\n' "$MODEL" "$OPENROUTER_API_KEY" > /root/.openclaw/openclaw.json
     elif [ -n "$OPENAI_API_KEY" ]; then
          echo "Configuring for OpenAI..."
-         cat <<EOF > /root/.openclaw/openclaw.json
-{
-  "agent": {
-    "model": "${MODEL}"
-  },
-  "llm": {
-    "provider": "openai",
-    "apiKey": "${OPENAI_API_KEY}"
-  }
-}
-EOF
+         printf '{\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "openai",\n    "apiKey": "%s"\n  }\n}\n' "$MODEL" "$OPENAI_API_KEY" > /root/.openclaw/openclaw.json
     elif [ -n "$ANTHROPIC_API_KEY" ]; then
          echo "Configuring for Anthropic..."
-         cat <<EOF > /root/.openclaw/openclaw.json
-{
-  "agent": {
-    "model": "${MODEL}"
-  },
-  "llm": {
-    "provider": "anthropic",
-    "apiKey": "${ANTHROPIC_API_KEY}"
-  }
-}
-EOF
+         printf '{\n  "agent": {\n    "model": "%s"\n  },\n  "llm": {\n    "provider": "anthropic",\n    "apiKey": "%s"\n  }\n}\n' "$MODEL" "$ANTHROPIC_API_KEY" > /root/.openclaw/openclaw.json
     else
-        echo "No API key found in environment variables (OPENROUTER_API_KEY or OPENAI_API_KEY)."
+        echo "No API key found in environment variables (OPENROUTER_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY)."
         echo "Starting with default/empty configuration. You may need to configure OpenClaw manually."
     fi
 }

@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     python3 \
     build-essential \
     git \
+    dos2unix \
     && rm -rf /var/lib/apt/lists/*
 
 # Install OpenClaw globally
@@ -16,6 +17,7 @@ WORKDIR /app
 
 # Copy entrypoint script
 COPY entrypoint.sh /entrypoint.sh
+RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh
 
 # Create the configuration directory and volume mount point
 RUN mkdir -p /root/.openclaw
