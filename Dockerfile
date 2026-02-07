@@ -13,16 +13,25 @@ RUN apt-get update && apt-get install -y \
     file \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv (fast python package manager)
+# Install uv (fast python package manager) to a global location
+ENV UV_INSTALL_DIR="/usr/local/bin"
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.cargo/bin:$PATH"
 
-# Install Homebrew (required for some skills)
-# define NONINTERACTIVE to avoid prompts
+# Install Homebrew (required for some skills) as non-root
+# Create linuxbrew user
+RUN useradd -m -s /bin/bash linuxbrew && \
+    usermod -aG sudo linuxbrew && \
+    mkdir -p /home/linuxbrew/.linuxbrew && \
+    chown -R linuxbrew:linuxbrew /home/linuxbrew/.linuxbrew
+
+# Switch to linuxbrew user for installation
+USER linuxbrew
 ENV NONINTERACTIVE=1
 RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-# Add brew to path
-ONBUILD ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+
+# Switch back to root to finish setup (OpenClaw runs as root usually)
+USER root
+# Add brew to path for all users
 ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
 
 # Install OpenClaw globally
