@@ -9,7 +9,7 @@ services:
     ports:
       - "18789:18789"
     volumes:
-      - ./data:/root/.openclaw
+      - ./data:/home/linuxbrew/.openclaw
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}

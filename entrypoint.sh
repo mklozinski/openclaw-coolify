@@ -1,19 +1,20 @@
 #!/bin/bash
 set -e
 
-# Ensure the config directory exists
-mkdir -p /root/.openclaw
+# Ensure the config directory exists and has correct permissions
+sudo mkdir -p /home/linuxbrew/.openclaw
+sudo chown -R linuxbrew:linuxbrew /home/linuxbrew/.openclaw
 
 # Function to generate openclaw.json
 generate_config() {
     # Allow full config injection via env var
     if [ -n "$OPENCLAW_CONFIG_CONTENT" ]; then
         echo "Using custom configuration from OPENCLAW_CONFIG_CONTENT..."
-        echo "$OPENCLAW_CONFIG_CONTENT" > /root/.openclaw/openclaw.json
+        echo "$OPENCLAW_CONFIG_CONTENT" > /home/linuxbrew/.openclaw/openclaw.json
         return
     fi
 
-    echo "Generating /root/.openclaw/openclaw.json..."
+    echo "Generating /home/linuxbrew/.openclaw/openclaw.json..."
 
     # Default model if not specified
     MODEL=${OPENCLAW_MODEL:-"anthropic/claude-3-opus-20240229"}
@@ -21,16 +22,16 @@ generate_config() {
     # Check for OpenRouter specific config
     if [ -n "$OPENROUTER_API_KEY" ]; then
         echo "Configuring for OpenRouter..."
-        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  },\n  "agents": {\n    "defaults": {\n      "model": { "primary": "%s" }\n    }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" > /root/.openclaw/openclaw.json
+        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  },\n  "agents": {\n    "defaults": {\n      "model": { "primary": "%s" }\n    }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" > /home/linuxbrew/.openclaw/openclaw.json
     elif [ -n "$OPENAI_API_KEY" ]; then
          echo "Configuring for OpenAI..."
-         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  },\n  "agents": {\n    "defaults": {\n      "model": { "primary": "%s" }\n    }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" > /root/.openclaw/openclaw.json
+         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  },\n  "agents": {\n    "defaults": {\n      "model": { "primary": "%s" }\n    }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" > /home/linuxbrew/.openclaw/openclaw.json
     elif [ -n "$ANTHROPIC_API_KEY" ]; then
          echo "Configuring for Anthropic..."
-         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  },\n  "agents": {\n    "defaults": {\n      "model": { "primary": "%s" }\n    }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" > /root/.openclaw/openclaw.json
+         printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  },\n  "agents": {\n    "defaults": {\n      "model": { "primary": "%s" }\n    }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" "$MODEL" > /home/linuxbrew/.openclaw/openclaw.json
     else
         echo "No API key found. Generating minimal configuration..."
-        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" > /root/.openclaw/openclaw.json
+        printf '{\n  "gateway": {\n    "mode": "local",\n    "bind": "lan",\n    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],\n    "auth": { "token": "%s" },\n    "controlUi": { "allowInsecureAuth": true }\n  }\n}\n' "${OPENCLAW_GATEWAY_TOKEN}" > /home/linuxbrew/.openclaw/openclaw.json
     fi
 }
 
@@ -57,11 +58,11 @@ if [ "$#" -gt 0 ]; then
 else
     ARGS="--port 18789 --verbose"
     
-    if [ ! -f "/root/.openclaw/openclaw.json" ]; then
-        echo "No configuration file found at /root/.openclaw/openclaw.json. Adding --allow-unconfigured flag."
+    if [ ! -f "/home/linuxbrew/.openclaw/openclaw.json" ]; then
+        echo "No configuration file found at /home/linuxbrew/.openclaw/openclaw.json. Adding --allow-unconfigured flag."
         ARGS="$ARGS --allow-unconfigured"
     else
-        echo "Configuration found at /root/.openclaw/openclaw.json."
+        echo "Configuration found at /home/linuxbrew/.openclaw/openclaw.json."
     fi
 
     echo "Starting OpenClaw Gateway with args: $ARGS"
