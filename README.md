@@ -1,97 +1,124 @@
 # OpenClaw on Coolify (Docker Deployment)
 
-This repository contains the necessary configuration to deploy OpenClaw (Personal AI Assistant) on a VPS using Coolify or standard Docker Compose.
+Deploy [OpenClaw](https://github.com/openclaw) (Personal AI Assistant) on a VPS using **Coolify** or standalone **Docker Compose**.
 
 ## Prerequisites
 
--   A server with Docker and Docker Compose installed (or Coolify).
--   An OpenRouter API Key (or OpenAI API Key).
+- A server with Docker and Docker Compose (or [Coolify](https://coolify.io))
+- At least one LLM API key: **OpenRouter**, **OpenAI**, or **Anthropic**
 
-## Deployment
+## Quick Start
 
-### Using Coolify
+### Coolify
 
-1.  Create a new Service in Coolify.
-2.  Choose "Git Repository" as the source.
-3.  Enter the URL of this public repository.
-4.  Set the **Build Pack** to `Docker Compose`.
-5.  In the **Environment Variables** section, add:
-    -   `OPENROUTER_API_KEY`: Your OpenRouter API Key.
-    -   `OPENCLAW_MODEL`: (Optional) The model you want to use, e.g., `anthropic/claude-3-opus`. Defaults to `anthropic/claude-3-opus-20240229`.
-6.  Deploy the service.
-7.  **Configuration in Coolify UI**:
-    -   Go to **Service** -> **Settings**.
-    -   Set **Domains** to your desired domain (e.g., `https://openclaw.your-domain.com`).
-    -   Ensure **Port Exposes** (or **Ports Exposes**) maps to container port `18789`. Usually Coolify detects this from the docker-compose or lets you specify it.
-    -   Save settings. Coolify should generate the Traefik configuration automatically.
-8.  Access the OpenClaw Gateway at your domain.
+1. Create a new **Service** in Coolify.
+2. Choose **Git Repository** as the source and enter this repo's URL.
+3. Set **Build Pack** to `Docker Compose`.
+4. Add the required environment variables (see [Environment Variables](#environment-variables) below).
+5. Deploy the service.
+6. In **Service → Settings**, set your **Domain** (e.g. `https://openclaw.example.com`) and confirm the exposed port is `18789`.
+7. Access OpenClaw at your domain.
 
-### Using Docker Compose Locally
+### Docker Compose (standalone)
 
-1.  Clone this repository.
-2.  Create a `.env` file with your keys:
-    ```env
-    OPENROUTER_API_KEY=sk-or-xxxx
-    ```
-3.  Run:
-    ```bash
-    docker-compose up -d --build
-    ```
+```bash
+git clone https://github.com/YOUR_USER/openclaw-coolify.git
+cd openclaw-coolify
 
-## Configuration
+# Create .env with your keys
+cat > .env <<EOF
+OPENROUTER_API_KEY=sk-or-xxxx
+OPENCLAW_GATEWAY_TOKEN=$(openssl rand -hex 32)
+EOF
 
-The `entrypoint.sh` script automatically generates a `~/.openclaw/openclaw.json` configuration file based on the environment variables if one does not exist.
+docker compose up -d --build
+```
 
-Supported Environment Variables:
+The gateway will be available at `http://localhost:18789`.
 
--   `OPENROUTER_API_KEY`: Your OpenRouter API Key.
--   `OPENAI_API_KEY`: Your OpenAI API Key (if using OpenAI directly).
--   `ANTHROPIC_API_KEY`: Your Anthropic API Key (if using Anthropic directly).
--   `OPENCLAW_GATEWAY_TOKEN`: A secure token for accessing the gateway. Ideally generated (e.g. `openssl rand -hex 16`). If not provided, a random one is generated on startup and printed to logs.
--   `OPENCLAW_MODEL`: The model ID to use (e.g., `openai/gpt-4o`, `anthropic/claude-3-sonnet`).
+## Environment Variables
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `OPENROUTER_API_KEY` | one of these | — | OpenRouter API key |
+| `OPENAI_API_KEY` | one of these | — | OpenAI API key |
+| `ANTHROPIC_API_KEY` | one of these | — | Anthropic API key |
+| `OPENCLAW_GATEWAY_TOKEN` | recommended | auto-generated | Token for gateway auth. Generate with `openssl rand -hex 32`. If not set, a random one is created on first start and printed in logs. |
+| `OPENCLAW_MODEL` | no | `openrouter/google/gemini-3-flash-preview` | Default model ID |
+| `OPENCLAW_CONFIG_CONTENT` | no | — | Inject a complete `openclaw.json` as a string (used only on first run, or with `OPENCLAW_FORCE_CONFIG`) |
+| `OPENCLAW_FORCE_CONFIG` | no | `false` | Set to `true` to overwrite the existing config with `OPENCLAW_CONFIG_CONTENT`. Useful for one-time resets. |
+| `TZ` | no | `UTC` | Container timezone |
 
 ## Persistence
 
-The configuration and data are stored in `/root/.openclaw`. This directory is mounted as a volume (`openclaw_data`) to ensure persistence across restarts.
+Two named Docker volumes keep your data safe across redeploys and container rebuilds:
 
+| Volume | Container path | What it stores |
+|---|---|---|
+| `openclaw-config` | `/home/linuxbrew/.openclaw` | `openclaw.json` (Telegram, OAuth, models, gateway settings) |
+| `openclaw-workspace` | `/home/linuxbrew/openclaw` | `MEMORY.md`, `AGENTS.md`, `memory/`, skills, workspace files |
 
-## Advanced Configuration: Multiple Models & Aliases
+**Configuration is only auto-generated on first run.** If `openclaw.json` already exists on the volume, it is preserved — your Telegram integration, Google OAuth, custom model aliases, and all other settings survive redeploys.
 
-To use multiple models or specific models for different tasks (to save costs), you have a few options:
+### Resetting configuration
 
-### 1. Using `OPENCLAW_CONFIG_CONTENT` (Recommended for Coolify)
+If you need to force a config reset:
 
-You can inject a full `openclaw.json` configuration using the `OPENCLAW_CONFIG_CONTENT` environment variable. This allows you to define multiple models and advanced settings.
+1. Set `OPENCLAW_FORCE_CONFIG=true` and `OPENCLAW_CONFIG_CONTENT=<your json>` in your environment.
+2. Redeploy. The entrypoint will overwrite the config with the content you provided.
+3. **Remove** `OPENCLAW_FORCE_CONFIG` (or set it back to `false`) afterwards so future redeploys don't keep overwriting.
 
-Example content for `OPENCLAW_CONFIG_CONTENT`:
+Alternatively, you can exec into the container and edit the config directly:
+
+```bash
+docker exec -it openclaw bash
+nano ~/.openclaw/openclaw.json
+# Then restart: docker restart openclaw
+```
+
+## Advanced Configuration
+
+### Full config injection via `OPENCLAW_CONFIG_CONTENT`
+
+For first-time setup, you can pass the entire `openclaw.json` as an environment variable. This is useful in Coolify where you can set env vars in the UI:
 
 ```json
 {
-  "agent": {
-    "model": "anthropic/claude-3-opus-20240229",
-    "fallbackModels": ["anthropic/claude-3-sonnet-20240229"]
+  "gateway": {
+    "mode": "local",
+    "bind": "lan",
+    "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
+    "auth": { "token": "your-token-here" },
+    "controlUi": { "allowInsecureAuth": true }
   },
-  "llm": {
-    "provider": "openrouter",
-    "apiKey": "sk-or-your-key"
+  "agents": {
+    "defaults": {
+      "model": { "primary": "openrouter/google/gemini-3-flash-preview" }
+    }
+  },
+  "telegram": {
+    "token": "123456:ABC-DEF...",
+    "allowedUsers": [123456789]
   }
 }
 ```
 
-### 2. Switching Models via CLI
+After the first deploy, any changes you make through the OpenClaw UI or API are saved to the volume and will persist — you don't need to touch this env var again.
 
-You can switch models on the fly when interacting with the agent via CLI (if you sh exec into the container):
+### Switching models at runtime
+
+If you exec into the container, you can run one-off commands with a different model:
 
 ```bash
 openclaw agent --model anthropic/claude-3-haiku --message "Quick check"
 ```
 
-### 3. Thinking Modes
+## Architecture
 
-OpenClaw supports "Thinking Modes" which can adjust the depth of reasoning. While this doesn't directly map "low thinking" to a specific cheaper model by default without configuration, you can use:
+```
+Dockerfile          → Builds the image (Node 22, Python, Homebrew, OpenClaw)
+entrypoint.sh       → Startup script (config generation, migration, launch)
+docker-compose.yaml → Service definition, volumes, networking
+```
 
--   Normal: standard model
--   `--thinking high`: Potentially uses more tokens/reasoning steps (check docs for specific model behavior).
-
- To strictly enforce cheaper models for simple tasks, setting a cheaper "primary" model and only using the expensive one explicitly (or vice versa) via configuration is the best approach.
-
+The container runs as non-root user `linuxbrew` for security, with `sudo` available for package installation by skills.
