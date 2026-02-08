@@ -15,14 +15,18 @@ Deploy [OpenClaw](https://github.com/openclaw) (Personal AI Assistant) on a VPS 
 2. Choose **Git Repository** as the source and enter this repo's URL.
 3. Set **Build Pack** to `Docker Compose`.
 4. Add the required environment variables (see [Environment Variables](#environment-variables) below).
-5. Deploy the service.
-6. In **Service → Settings**, set your **Domain** (e.g. `https://openclaw.example.com`) and confirm the exposed port is `18789`.
-7. Access OpenClaw at your domain.
+5. Set your **Domain** with HTTPS (e.g. `https://openclaw.example.com`) and confirm the exposed port is `18789`.
+6. **Deploy** the service.
+7. Check the **Logs** — on the first deploy you will see the auto-generated gateway token. Copy it and save it as the `OPENCLAW_GATEWAY_TOKEN` environment variable.
+8. Open your domain with the token: `https://your-domain/?token=YOUR_TOKEN`.
+9. **Redeploy** the service (so it picks up the saved token).
+10. Go to the **Service → Terminal** and run `openclaw onboard`. Follow the prompts to configure OAuth, models, and other settings.
+11. **Redeploy** one more time, then open your domain and continue onboarding in the chat UI.
 
 ### Docker Compose (standalone)
 
 ```bash
-git clone https://github.com/YOUR_USER/openclaw-coolify.git
+git clone https://github.com/mklozinski/openclaw-coolify.git
 cd openclaw-coolify
 
 # Create .env with your keys
