@@ -1,9 +1,20 @@
 #!/bin/bash
 set -e
 
-# Ensure the config directory exists and has correct permissions
-sudo mkdir -p /home/linuxbrew/.openclaw
-sudo chown -R linuxbrew:linuxbrew /home/linuxbrew/.openclaw
+# Migrate data from old location if it exists
+if [ -d "/root/.openclaw" ] && [ "$(ls -A /root/.openclaw 2>/dev/null)" ]; then
+    echo "========================================="
+    echo "Migrating data from /root/.openclaw to /home/linuxbrew/.openclaw..."
+    echo "========================================="
+    sudo mkdir -p /home/linuxbrew/.openclaw
+    sudo cp -rn /root/.openclaw/* /home/linuxbrew/.openclaw/ || true
+    sudo chown -R linuxbrew:linuxbrew /home/linuxbrew/.openclaw
+    echo "Migration complete!"
+else
+    # Ensure the config directory exists and has correct permissions
+    sudo mkdir -p /home/linuxbrew/.openclaw
+    sudo chown -R linuxbrew:linuxbrew /home/linuxbrew/.openclaw
+fi
 
 # Function to generate openclaw.json
 generate_config() {

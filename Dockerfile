@@ -52,6 +52,7 @@ RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh && chown linuxbrew:linuxb
 
 # Switch to non-root user for runtime
 USER linuxbrew
+ENV HOME=/home/linuxbrew
 WORKDIR /home/linuxbrew/openclaw
 
 # Expose the gateway port
