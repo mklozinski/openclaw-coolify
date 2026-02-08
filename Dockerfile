@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     procps \
     file \
+    sudo \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv (fast python package manager) to a global location
