@@ -33,21 +33,25 @@ fi
 # Generate config ONLY if it doesn't already exist
 # This preserves Telegram, OAuth, model, and other settings across redeploys
 generate_config() {
-    # OPENCLAW_CONFIG_CONTENT always wins — explicit full-config injection
+    # OPENCLAW_CONFIG_CONTENT + FORCE always wins — explicit full-config injection
     if [ -n "$OPENCLAW_CONFIG_CONTENT" ] && [ "$OPENCLAW_FORCE_CONFIG" = "true" ]; then
         echo "OPENCLAW_FORCE_CONFIG=true with OPENCLAW_CONFIG_CONTENT — overwriting config..."
         echo "$OPENCLAW_CONFIG_CONTENT" > "$CONFIG_FILE"
         return
     fi
 
-    # If config already exists on the persistent volume, DO NOT overwrite it
-    if [ -f "$CONFIG_FILE" ]; then
+    # If config exists AND force is NOT set, preserve it
+    if [ -f "$CONFIG_FILE" ] && [ "$OPENCLAW_FORCE_CONFIG" != "true" ]; then
         echo "Existing configuration found at $CONFIG_FILE — preserving it."
         echo "(Set OPENCLAW_FORCE_CONFIG=true to overwrite with env-based config)"
         return
     fi
 
-    echo "No existing config found. Generating $CONFIG_FILE..."
+    if [ "$OPENCLAW_FORCE_CONFIG" = "true" ]; then
+        echo "OPENCLAW_FORCE_CONFIG=true — regenerating config from environment variables..."
+    else
+        echo "No existing config found. Generating $CONFIG_FILE..."
+    fi
 
     # If full config content is provided via env, use it
     if [ -n "$OPENCLAW_CONFIG_CONTENT" ]; then
