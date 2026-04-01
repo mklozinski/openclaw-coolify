@@ -6,8 +6,19 @@ CONFIG_FILE="$CONFIG_DIR/openclaw.json"
 WORKSPACE_DIR="/home/linuxbrew/openclaw"
 
 # Ensure directories exist with correct permissions
-sudo mkdir -p "$CONFIG_DIR" "$WORKSPACE_DIR"
-sudo chown -R linuxbrew:linuxbrew "$CONFIG_DIR" "$WORKSPACE_DIR"
+sudo mkdir -p "$CONFIG_DIR" "$WORKSPACE_DIR" /home/linuxbrew/.linuxbrew /home/linuxbrew/.local
+sudo chown -R linuxbrew:linuxbrew "$CONFIG_DIR" "$WORKSPACE_DIR" /home/linuxbrew/.linuxbrew /home/linuxbrew/.local
+
+# Ensure pip user-installed binaries are on PATH
+export PATH="/home/linuxbrew/.local/bin:$PATH"
+
+# Configure Git with GitHub PAT for seamless repo access
+if [ -n "$GITHUB_TOKEN" ]; then
+    git config --global credential.helper store
+    echo "https://x-access-token:${GITHUB_TOKEN}@github.com" > /home/linuxbrew/.git-credentials
+    chmod 600 /home/linuxbrew/.git-credentials
+    echo "GitHub token configured for git operations."
+fi
 
 # Migrate data from old location if it exists (one-time migration)
 if [ -d "/root/.openclaw" ] && [ "$(ls -A /root/.openclaw 2>/dev/null)" ]; then
@@ -51,6 +62,22 @@ generate_config() {
     # Build minimal initial config
     if [ -n "$OPENROUTER_API_KEY" ] || [ -n "$OPENAI_API_KEY" ] || [ -n "$ANTHROPIC_API_KEY" ]; then
         echo "Generating initial config with model: $MODEL"
+        # Build elevated config if Telegram IDs are provided
+        ELEVATED_BLOCK=""
+        if [ -n "$OPENCLAW_TELEGRAM_ELEVATED_IDS" ]; then
+            ELEVATED_BLOCK=$(cat <<EOFTOOLS
+  "tools": {
+    "elevated": {
+      "enabled": true,
+      "allowFrom": {
+        "telegram": ${OPENCLAW_TELEGRAM_ELEVATED_IDS}
+      }
+    }
+  },
+EOFTOOLS
+)
+        fi
+
         cat > "$CONFIG_FILE" <<EOF
 {
   "gateway": {
@@ -60,6 +87,7 @@ generate_config() {
     "auth": { "token": "${OPENCLAW_GATEWAY_TOKEN}" },
     "controlUi": { "allowInsecureAuth": true }
   },
+${ELEVATED_BLOCK}
   "agents": {
     "defaults": {
       "model": { "primary": "${MODEL}" }

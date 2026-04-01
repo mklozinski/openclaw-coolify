@@ -51,18 +51,24 @@ The gateway will be available at `http://localhost:18789`.
 | `OPENCLAW_MODEL` | no | `openrouter/google/gemini-3-flash-preview` | Default model ID |
 | `OPENCLAW_CONFIG_CONTENT` | no | — | Inject a complete `openclaw.json` as a string (used only on first run, or with `OPENCLAW_FORCE_CONFIG`) |
 | `OPENCLAW_FORCE_CONFIG` | no | `false` | Set to `true` to overwrite the existing config with `OPENCLAW_CONFIG_CONTENT`. Useful for one-time resets. |
+| `OPENCLAW_TELEGRAM_ELEVATED_IDS` | no | `[]` | JSON array of Telegram user IDs (numeric) that are granted auto-elevated access — no `/elevated` needed. Example: `["123456789"]`. Find your ID by messaging `@userinfobot` on Telegram. |
+| `GITHUB_TOKEN` | no | — | GitHub Personal Access Token (PAT) for repo access. Automatically configures `git` credentials so OpenClaw can clone, push, and create repos. The token is stored securely at runtime (`chmod 600`) and never baked into the image. |
 | `TZ` | no | `UTC` | Container timezone |
 
 ## Persistence
 
-Two named Docker volumes keep your data safe across redeploys and container rebuilds:
+Named Docker volumes keep your data safe across redeploys and container rebuilds:
 
 | Volume | Container path | What it stores |
 |---|---|---|
 | `openclaw-config` | `/home/linuxbrew/.openclaw` | `openclaw.json` (Telegram, OAuth, models, gateway settings) |
 | `openclaw-workspace` | `/home/linuxbrew/openclaw` | `MEMORY.md`, `AGENTS.md`, `memory/`, skills, workspace files |
+| `openclaw-homebrew` | `/home/linuxbrew/.linuxbrew` | Homebrew-installed packages (yt-dlp, ffmpeg, etc.) |
+| `openclaw-pip` | `/home/linuxbrew/.local` | pip user-installed Python packages and their binaries |
 
 **Configuration is only auto-generated on first run.** If `openclaw.json` already exists on the volume, it is preserved — your Telegram integration, Google OAuth, custom model aliases, and all other settings survive redeploys.
+
+**Runtime packages persist too.** Any packages installed by OpenClaw skills at runtime (e.g. `pip install yt-dlp` or `brew install ffmpeg`) are stored on the `openclaw-homebrew` and `openclaw-pip` volumes. They survive container restarts, redeploys, and are shared across all skills — no duplicate installations.
 
 ### Resetting configuration
 

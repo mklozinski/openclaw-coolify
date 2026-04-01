@@ -13,15 +13,22 @@ services:
       - openclaw-config:/home/linuxbrew/.openclaw
       # Workspace volume — persists MEMORY.md, AGENTS.md, memory/, skills, etc.
       - openclaw-workspace:/home/linuxbrew/openclaw
+      # Homebrew volume — persists brew-installed packages (yt-dlp, ffmpeg, etc.)
+      - openclaw-homebrew:/home/linuxbrew/.linuxbrew
+      # Pip packages volume — persists pip-installed Python packages
+      - openclaw-pip:/home/linuxbrew/.local
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GITHUB_TOKEN=${GITHUB_TOKEN}
       - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
       - OPENCLAW_MODEL=${OPENCLAW_MODEL:-openrouter/google/gemini-3-flash-preview}
       - OPENCLAW_CONFIG_CONTENT=${OPENCLAW_CONFIG_CONTENT}
       # Set to "true" to force-overwrite config from env vars (one-time reset)
       - OPENCLAW_FORCE_CONFIG=${OPENCLAW_FORCE_CONFIG:-false}
+      # JSON array of Telegram user IDs for auto-elevated access, e.g. ["123456789"]
+      - OPENCLAW_TELEGRAM_ELEVATED_IDS=${OPENCLAW_TELEGRAM_ELEVATED_IDS}
       - TZ=UTC
     labels:
       - traefik.enable=true
@@ -38,3 +45,5 @@ services:
 volumes:
   openclaw-config:
   openclaw-workspace:
+  openclaw-homebrew:
+  openclaw-pip:

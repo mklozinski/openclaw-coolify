@@ -4,6 +4,7 @@ FROM node:22-bookworm
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
+    python3-venv \
     build-essential \
     git \
     curl \
@@ -42,6 +43,8 @@ RUN dos2unix /entrypoint.sh && chmod +x /entrypoint.sh && chown linuxbrew:linuxb
 # Runtime as non-root
 USER linuxbrew
 ENV HOME=/home/linuxbrew
+# Allow pip install without --user flag on Debian Bookworm (PEP 668)
+ENV PIP_BREAK_SYSTEM_PACKAGES=1
 WORKDIR /home/linuxbrew/openclaw
 
 EXPOSE 18789
