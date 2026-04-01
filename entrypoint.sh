@@ -78,6 +78,12 @@ EOFTOOLS
 )
         fi
 
+        # Build controlUi config with allowed origins
+        CONTROL_UI='"allowInsecureAuth": true'
+        if [ -n "$OPENCLAW_DOMAIN" ]; then
+            CONTROL_UI='"allowInsecureAuth": true, "allowedOrigins": ["https://'"$OPENCLAW_DOMAIN"'"]'
+        fi
+
         cat > "$CONFIG_FILE" <<EOF
 {
   "gateway": {
@@ -85,7 +91,7 @@ EOFTOOLS
     "bind": "lan",
     "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
     "auth": { "token": "${OPENCLAW_GATEWAY_TOKEN}" },
-    "controlUi": { "allowInsecureAuth": true }
+    "controlUi": { ${CONTROL_UI} }
   },
 ${ELEVATED_BLOCK}
   "agents": {
@@ -97,6 +103,12 @@ ${ELEVATED_BLOCK}
 EOF
     else
         echo "No API key found. Generating minimal gateway-only configuration..."
+        # Build controlUi config with allowed origins
+        CONTROL_UI_MIN='"allowInsecureAuth": true'
+        if [ -n "$OPENCLAW_DOMAIN" ]; then
+            CONTROL_UI_MIN='"allowInsecureAuth": true, "allowedOrigins": ["https://'"$OPENCLAW_DOMAIN"'"]'
+        fi
+
         cat > "$CONFIG_FILE" <<EOF
 {
   "gateway": {
@@ -104,7 +116,7 @@ EOF
     "bind": "lan",
     "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
     "auth": { "token": "${OPENCLAW_GATEWAY_TOKEN}" },
-    "controlUi": { "allowInsecureAuth": true }
+    "controlUi": { ${CONTROL_UI_MIN} }
   }
 }
 EOF

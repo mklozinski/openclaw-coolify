@@ -53,6 +53,7 @@ The gateway will be available at `http://localhost:18789`.
 | `OPENCLAW_FORCE_CONFIG` | no | `false` | Set to `true` to overwrite the existing config with `OPENCLAW_CONFIG_CONTENT`. Useful for one-time resets. |
 | `OPENCLAW_TELEGRAM_ELEVATED_IDS` | no | `[]` | JSON array of Telegram user IDs (numeric) that are granted auto-elevated access — no `/elevated` needed. Example: `["123456789"]`. Find your ID by messaging `@userinfobot` on Telegram. |
 | `GITHUB_TOKEN` | no | — | GitHub Personal Access Token (PAT) for repo access. Automatically configures `git` credentials so OpenClaw can clone, push, and create repos. The token is stored securely at runtime (`chmod 600`) and never baked into the image. |
+| `OPENCLAW_DOMAIN` | recommended | — | Your domain without `https://` (e.g. `assistant.project.mydomain.dev`). Adds it to `gateway.controlUi.allowedOrigins` so the Control UI works from your domain. |
 | `TZ` | no | `UTC` | Container timezone |
 
 ## Persistence

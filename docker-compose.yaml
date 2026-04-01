@@ -29,6 +29,8 @@ services:
       - OPENCLAW_FORCE_CONFIG=${OPENCLAW_FORCE_CONFIG:-false}
       # JSON array of Telegram user IDs for auto-elevated access, e.g. ["123456789"]
       - OPENCLAW_TELEGRAM_ELEVATED_IDS=${OPENCLAW_TELEGRAM_ELEVATED_IDS}
+      # Your domain (without https://), e.g. assistant.project.mydomain.dev
+      - OPENCLAW_DOMAIN=${OPENCLAW_DOMAIN}
       - TZ=UTC
     labels:
       - traefik.enable=true
