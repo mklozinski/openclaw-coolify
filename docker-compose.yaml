@@ -2,20 +2,23 @@ version: '3.8'
 
 services:
   openclaw:
-    build: .
+    build:
+      context: .
+      args:
+        OPENCLAW_NPM_SPEC: ${OPENCLAW_NPM_SPEC:-openclaw@latest}
     image: openclaw-coolify
     container_name: openclaw
     restart: unless-stopped
     ports:
       - "18789:18789"
     volumes:
-      # Config volume — persists openclaw.json, Telegram, OAuth, model settings
+      # Config volume - persists openclaw.json and OpenClaw config state.
       - openclaw-config:/home/linuxbrew/.openclaw
-      # Workspace volume — persists MEMORY.md, AGENTS.md, memory/, skills, etc.
-      - openclaw-workspace:/home/linuxbrew/openclaw
-      # Homebrew volume — persists brew-installed packages (yt-dlp, ffmpeg, etc.)
+      # Workspace volume - persists MEMORY.md, AGENTS.md, memory/, skills, and other workspace files.
+      - openclaw-workspace:/home/linuxbrew/.openclaw/workspace
+      # Homebrew volume - persists shared tools installed via Homebrew.
       - openclaw-homebrew:/home/linuxbrew/.linuxbrew
-      # Pip packages volume — persists pip-installed Python packages
+      # Pip packages volume - persists pip-installed Python packages and binaries.
       - openclaw-pip:/home/linuxbrew/.local
     environment:
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
@@ -25,8 +28,12 @@ services:
       - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
       - OPENCLAW_MODEL=${OPENCLAW_MODEL:-openrouter/google/gemini-3-flash-preview}
       - OPENCLAW_CONFIG_CONTENT=${OPENCLAW_CONFIG_CONTENT}
-      # Set to "true" to force-overwrite config from env vars (one-time reset)
+      # Set to "true" to force-overwrite config from env vars (one-time reset).
       - OPENCLAW_FORCE_CONFIG=${OPENCLAW_FORCE_CONFIG:-false}
+      # Optional persistent shared tools, for example: "ffmpeg yt-dlp"
+      - OPENCLAW_BREW_PACKAGES=${OPENCLAW_BREW_PACKAGES}
+      # Set to "true" to move a stale ~/.local OpenClaw install aside automatically.
+      - OPENCLAW_RENAME_STALE_LOCAL_OPENCLAW=${OPENCLAW_RENAME_STALE_LOCAL_OPENCLAW:-false}
       # JSON array of Telegram user IDs for auto-elevated access, e.g. ["123456789"]
       - OPENCLAW_TELEGRAM_ELEVATED_IDS=${OPENCLAW_TELEGRAM_ELEVATED_IDS}
       # Your domain (without https://), e.g. assistant.project.mydomain.dev

@@ -1,5 +1,7 @@
 FROM node:22-bookworm
 
+ARG OPENCLAW_NPM_SPEC="openclaw@latest"
+
 # System dependencies needed for native node modules and skills
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -27,13 +29,13 @@ USER linuxbrew
 ENV NONINTERACTIVE=1
 RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 USER root
-ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:$PATH"
+ENV PATH="/usr/local/bin:/usr/local/sbin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/linuxbrew/.local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 # Install OpenClaw
-RUN npm install -g openclaw@latest
+RUN npm install -g "${OPENCLAW_NPM_SPEC}"
 
 # Create persistent directories
-RUN mkdir -p /home/linuxbrew/.openclaw /home/linuxbrew/openclaw && \
+RUN mkdir -p /home/linuxbrew/.openclaw/workspace /home/linuxbrew/.linuxbrew /home/linuxbrew/.local && \
     chown -R linuxbrew:linuxbrew /home/linuxbrew
 
 # Copy and prepare entrypoint
@@ -45,7 +47,7 @@ USER linuxbrew
 ENV HOME=/home/linuxbrew
 # Allow pip install without --user flag on Debian Bookworm (PEP 668)
 ENV PIP_BREAK_SYSTEM_PACKAGES=1
-WORKDIR /home/linuxbrew/openclaw
+WORKDIR /home/linuxbrew/.openclaw/workspace
 
 EXPOSE 18789
 
