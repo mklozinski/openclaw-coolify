@@ -34,7 +34,8 @@ services:
       - OPENCLAW_BREW_PACKAGES=${OPENCLAW_BREW_PACKAGES}
       # Set to "true" to move a stale ~/.local OpenClaw install aside automatically.
       - OPENCLAW_RENAME_STALE_LOCAL_OPENCLAW=${OPENCLAW_RENAME_STALE_LOCAL_OPENCLAW:-false}
-      # JSON array of Telegram user IDs for auto-elevated access, e.g. ["123456789"]
+      # Telegram user IDs for auto-elevated access. Comma-separated or JSON array.
+      # Examples: "123456789,987654321" or '["123456789","987654321"]'
       - OPENCLAW_TELEGRAM_ELEVATED_IDS=${OPENCLAW_TELEGRAM_ELEVATED_IDS}
       # Your domain (without https://), e.g. assistant.project.mydomain.dev
       - OPENCLAW_DOMAIN=${OPENCLAW_DOMAIN}

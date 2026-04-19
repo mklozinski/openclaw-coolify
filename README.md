@@ -61,7 +61,7 @@ This repository runs `openclaw gateway` as the foreground container process. It 
 | `OPENCLAW_FORCE_CONFIG` | no | `false` | Set to `true` to overwrite the existing config with `OPENCLAW_CONFIG_CONTENT`. |
 | `OPENCLAW_BREW_PACKAGES` | no | none | Optional space-separated Homebrew packages to install once into persistent storage, for example `ffmpeg yt-dlp`. |
 | `OPENCLAW_RENAME_STALE_LOCAL_OPENCLAW` | no | `false` | Set to `true` to move a stale `~/.local` OpenClaw install aside instead of only warning. |
-| `OPENCLAW_TELEGRAM_ELEVATED_IDS` | no | none | JSON array of Telegram user IDs that should receive elevated access automatically. |
+| `OPENCLAW_TELEGRAM_ELEVATED_IDS` | no | none | Telegram user IDs for elevated access. Comma-separated (`123456789,987654321`) or JSON array (`["123456789"]`). |
 | `GITHUB_TOKEN` | no | none | GitHub PAT for repo access. Configured into git credentials at runtime. |
 | `OPENCLAW_DOMAIN` | recommended | none | Your domain without `https://`. Added to `gateway.controlUi.allowedOrigins`. |
 | `TZ` | no | `UTC` | Container timezone |

@@ -172,12 +172,23 @@ generate_config() {
         # Build elevated config if Telegram IDs are provided.
         ELEVATED_BLOCK=""
         if [ -n "$OPENCLAW_TELEGRAM_ELEVATED_IDS" ]; then
+            # Sanitize: strip literal backslashes that Coolify/Docker may inject
+            # when escaping quotes inside environment variable values.
+            CLEAN_IDS=$(echo "$OPENCLAW_TELEGRAM_ELEVATED_IDS" | tr -d '\\')
+
+            # Support both JSON array ["id1","id2"] and simple comma-separated id1,id2 formats.
+            # If the value does NOT start with '[', treat it as comma-separated IDs and wrap them.
+            if [[ "$CLEAN_IDS" != \[* ]]; then
+                # Convert comma-separated list to JSON array: "id1,id2" -> ["id1","id2"]
+                CLEAN_IDS=$(echo "$CLEAN_IDS" | sed 's/[[:space:]]//g; s/,/","/g; s/^/["/; s/$/"]/')
+            fi
+
             ELEVATED_BLOCK=$(cat <<EOFTOOLS
   "tools": {
     "elevated": {
       "enabled": true,
       "allowFrom": {
-        "telegram": ${OPENCLAW_TELEGRAM_ELEVATED_IDS}
+        "telegram": ${CLEAN_IDS}
       }
     }
   },
